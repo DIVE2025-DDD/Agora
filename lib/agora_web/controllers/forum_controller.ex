@@ -81,4 +81,36 @@ defmodule AgoraWeb.ForumController do
       _ -> nil
     end
   end
+
+  # POST /api/forum/:forum_id/generate_evidence
+  def generate_evidence(conn, %{"forum_id" => forum_id, "ids" => ids} = _params) do
+    Logger.info("Generating evidence for forum #{forum_id} with chat ids: #{inspect(ids)}")
+    
+    # 샘플 응답 데이터
+    sample_messages = [
+      "선택하신 의견들을 분석한 결과, 지속가능성 측면에서 긍정적인 효과가 예상됩니다. 특히 환경적 영향을 고려할 때 2025년까지 약 15%의 개선 효과를 기대할 수 있습니다.",
+      "제시된 논점들을 종합해보면, 경제적 타당성과 환경적 지속가능성 사이의 균형이 중요합니다. 데이터에 따르면 장기적으로 투자 대비 효과가 높을 것으로 예측됩니다.",
+      "분석 결과, 선택하신 의견들은 SDG 목표 달성에 직접적으로 기여할 수 있는 방향성을 제시하고 있습니다. 구체적인 실행 계획이 필요한 상황입니다."
+    ]
+    
+    # 랜덤하게 차트 또는 메시지 타입 결정
+    is_chart = Enum.random([true, false])
+    
+    response = if is_chart do
+      %{
+        type: "chart",
+        message: "CHART_DATA"
+      }
+    else
+      %{
+        type: "message", 
+        message: Enum.random(sample_messages)
+      }
+    end
+    
+    json(conn, %{
+      success: true,
+      data: response
+    })
+  end
 end

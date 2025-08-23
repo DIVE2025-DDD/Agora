@@ -149,57 +149,59 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
 
       setIsGenerating(true);
 
-      // 샘플 데이터로 처리
-      setTimeout(() => {
-        const selectedChatData = chats.filter((chat) =>
-          selectedChats.includes(chat.id),
-        );
+      // API 호출
+      fetch(`/api/forum/${forum.id}/generate_evidence`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ids: selectedChats
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          let aiResponse: Chat;
 
-        // 랜덤하게 차트 또는 메시지 타입 결정
-        const isChart = Math.random() > 0.5;
+          if (data.data.type === "chart") {
+            // 차트 응답
+            aiResponse = {
+              id: Date.now(),
+              message: "CHART_DATA",
+              sequence: Math.max(...chats.map(c => c.sequence)) + 1,
+              inserted_at: new Date().toISOString(),
+              user: {
+                id: -1,
+                email: "DDD-bot",
+              },
+            };
+          } else {
+            // 메시지 응답
+            aiResponse = {
+              id: Date.now(),
+              message: data.data.message,
+              sequence: Math.max(...chats.map(c => c.sequence)) + 1,
+              inserted_at: new Date().toISOString(),
+              user: {
+                id: -1,
+                email: "DDD-bot",
+              },
+            };
+          }
 
-        let aiResponse: Chat;
-
-        if (isChart) {
-          // 차트 응답
-          aiResponse = {
-            id: Date.now(),
-            message: "CHART_DATA",
-            sequence: chats.length + 1,
-            inserted_at: new Date().toISOString(),
-            user: {
-              id: -1,
-              email: "AI Assistant",
-            },
-          };
-        } else {
-          // 메시지 응답
-          const sampleMessages = [
-            "선택하신 의견들을 분석한 결과, 지속가능성 측면에서 긍정적인 효과가 예상됩니다. 특히 환경적 영향을 고려할 때 2025년까지 약 15%의 개선 효과를 기대할 수 있습니다.",
-            "제시된 논점들을 종합해보면, 경제적 타당성과 환경적 지속가능성 사이의 균형이 중요합니다. 데이터에 따르면 장기적으로 투자 대비 효과가 높을 것으로 예측됩니다.",
-            "분석 결과, 선택하신 의견들은 SDG 목표 달성에 직접적으로 기여할 수 있는 방향성을 제시하고 있습니다. 구체적인 실행 계획이 필요한 상황입니다.",
-          ];
-
-          aiResponse = {
-            id: Date.now(),
-            message:
-              sampleMessages[Math.floor(Math.random() * sampleMessages.length)],
-            sequence: chats.length + 1,
-            inserted_at: new Date().toISOString(),
-            user: {
-              id: -1,
-              email: "AI Assistant",
-            },
-          };
+          setChats((prev) => [...prev, aiResponse]);
         }
-
-        setChats((prev) => [...prev, aiResponse]);
 
         // 모드 리셋
         setIsEvidenceMode(false);
         setSelectedChats([]);
         setIsGenerating(false);
-      }, 2000); // 2초 딜레이로 로딩 효과
+      })
+      .catch(error => {
+        console.error('Error generating evidence:', error);
+        setIsGenerating(false);
+      });
     }
   };
 

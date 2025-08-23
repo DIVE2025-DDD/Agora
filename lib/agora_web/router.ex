@@ -56,9 +56,11 @@ defmodule AgoraWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", AgoraWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", AgoraWeb do
+    pipe_through :api
+    
+    post "/forum/:forum_id/generate_evidence", ForumController, :generate_evidence
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:agora, :dev_routes) do
