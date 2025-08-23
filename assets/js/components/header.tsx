@@ -1,6 +1,7 @@
-import React, {useEffect, useRef, useState} from "react";
-import {Link, useForm, usePage} from "@inertiajs/react";
-import {ChevronDown, LogOut, User, UserPlus,} from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useForm, usePage } from "@inertiajs/react";
+import { ChevronDown, LogOut, User, UserPlus } from "lucide-react";
+import Button from "./Button";
 
 const Header = () => {
   const { props } = usePage();
@@ -34,16 +35,24 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-8">
-            <div className="text-2xl font-bold text-blue-600">Agora</div>
+            <div className="text-2xl font-bold text-blue-600">
+              <Button href="/" as="a" variant="ghost">
+                <img
+                  src="/images/logo.png"
+                  alt="Agora"
+                  className="h-6 w-auto"
+                />
+              </Button>
+            </div>
             <nav className="flex space-x-6">
               <a
-                href="#"
+                href="/"
                 className="text-gray-700 hover:text-blue-600 font-medium"
               >
-                토론
+                토론하기
               </a>
               <a href="#" className="text-gray-500 hover:text-blue-600">
-                아이디어
+                마이페이지
               </a>
             </nav>
           </div>

@@ -11,7 +11,7 @@ type Variant =
 type Size = "sm" | "md" | "lg";
 
 export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type"> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
   fullWidth?: boolean;
@@ -37,6 +37,7 @@ const Button: React.FC<ButtonProps> = ({
   children,
   as = "button",
   href,
+  type,
   ...rest
 }) => {
   const base =
@@ -105,7 +106,7 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
-      type="button"
+      type={type ?? "button"}
       className={classes}
       disabled={disabled || loading}
       aria-busy={loading || undefined}

@@ -1,6 +1,7 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+@import "quill/dist/quill.snow.css";
 
 /* This file is for your main application CSS */
 /* =============== AGORA TOKENS =============== */
@@ -48,6 +49,12 @@
         @apply font-medium;
         font-size: 2.5rem;
         line-height: 1.2;
+        letter-spacing: 0;
+    }
+    .ag-title-20-m {
+        @apply font-medium;
+        font-size: 2rem;
+        line-height: 1;
         letter-spacing: 0;
     }
 

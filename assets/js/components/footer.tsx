@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Globe,
-  Mail,
-  Phone,
-  MapPin,
-  Github,
-  Linkedin,
-  Twitter,
-} from "lucide-react";
+import {Github, Linkedin, Twitter,} from "lucide-react";
 
 const Footer = () => {
   return (
@@ -18,7 +10,7 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
               <img
-                src="/images/logo.svg"
+                src="/images/logo.png"
                 alt="UNDP Logo"
                 className="h-12 w-auto"
               />
