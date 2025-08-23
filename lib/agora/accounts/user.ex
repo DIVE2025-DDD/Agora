@@ -4,10 +4,12 @@ defmodule Agora.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :nickname, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
+    field :role, :string, default: "user"
 
     timestamps(type: :utc_datetime)
   end
@@ -37,9 +39,21 @@ defmodule Agora.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :nickname, :password, :role])
+    |> validate_required([:nickname, :role])
+    |> validate_inclusion(:role, ["user", "admin"])
+    |> validate_nickname(opts)
     |> validate_email(opts)
     |> validate_password(opts)
+  end
+
+  defp validate_nickname(changeset, opts) do
+    changeset
+    |> validate_length(:nickname, min: 2, max: 20)
+    |> validate_format(:nickname, ~r/^[a-zA-Z0-9가-힣_]+$/,
+      message: "닉네임은 한글, 영문, 숫자, 밑줄만 사용할 수 있습니다"
+    )
+    |> maybe_validate_unique_nickname(opts)
   end
 
   defp validate_email(changeset, opts) do
@@ -83,6 +97,16 @@ defmodule Agora.Accounts.User do
       changeset
       |> unsafe_validate_unique(:email, Agora.Repo)
       |> unique_constraint(:email)
+    else
+      changeset
+    end
+  end
+
+  defp maybe_validate_unique_nickname(changeset, opts) do
+    if Keyword.get(opts, :validate_nickname, true) do
+      changeset
+      |> unsafe_validate_unique(:nickname, Agora.Repo)
+      |> unique_constraint(:nickname)
     else
       changeset
     end
@@ -168,4 +192,16 @@ defmodule Agora.Accounts.User do
     |> validate_required([:email, :password])
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "이메일 형식이 올바르지 않습니다")
   end
+
+  @doc """
+  Checks if a user has admin role.
+  """
+  def admin?(%Agora.Accounts.User{role: "admin"}), do: true
+  def admin?(_), do: false
+
+  @doc """
+  Checks if a user has user role.
+  """
+  def user?(%Agora.Accounts.User{role: "user"}), do: true
+  def user?(_), do: false
 end

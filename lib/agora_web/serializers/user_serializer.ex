@@ -2,6 +2,7 @@ defmodule AgoraWeb.UserSerializer do
   def to_map(user = %Agora.Accounts.User{}) do
     %{
       id: user.id,
+      nickname: user.nickname,
       email: user.email
     }
   end

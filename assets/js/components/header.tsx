@@ -66,6 +66,7 @@ const Header = () => {
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                     <User size={18} className="text-white" />
                   </div>
+                  <span className="text-sm text-gray-700">{user.nickname}</span>
                   <ChevronDown
                     size={16}
                     className={`transform transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
@@ -76,6 +77,9 @@ const Header = () => {
                   <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
                     <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                       <p className="text-sm text-gray-600">환영합니다</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {user.nickname}
+                      </p>
                     </div>
                     <Link
                       href="/users/profile"

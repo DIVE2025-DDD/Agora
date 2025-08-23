@@ -226,10 +226,10 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                     .sort((a, b) => a.sequence - b.sequence)
                     .map((chat) => {
                       const isMyMessage = user && chat.user.id === user.id;
-                      
+
                       return (
-                        <div 
-                          key={chat.id} 
+                        <div
+                          key={chat.id}
                           className={`flex items-start space-x-3 ${
                             isMyMessage ? "flex-row-reverse space-x-reverse" : ""
                           }`}
@@ -252,7 +252,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                               isMyMessage ? "flex-row-reverse space-x-reverse" : ""
                             }`}>
                               <span className="text-xs font-medium text-gray-600">
-                                {chat.user.email}
+                                {chat.user.nickname}
                               </span>
                               <span className="text-xs text-gray-400">
                                 {formatDate(chat.inserted_at)}
