@@ -48,7 +48,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Back button and title */}
         <div className="flex items-center mb-6">
@@ -102,7 +102,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
 
           {/* Subject content body */}
           <div
-            className={`mt-4 bg-white rounded-lg shadow-sm border p-4 ${isExpanded ? "block" : "hidden"}`}
+            className={`mt-4 bg-white rounded-lg border border-gray-200 shadow-sm p-4 ${isExpanded ? "block" : "hidden"}`}
           >
             <div className="text-sm text-gray-700 leading-relaxed space-y-3">
               <p>{forum.content}</p>
@@ -121,17 +121,17 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Section - Chat */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Section - Chat (2/3 width) */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white rounded-lg border border-gray-200 shadow overflow-hidden h-full flex flex-col">
               {/* Chat header */}
               <div className="bg-blue-500 text-white px-4 py-3">
                 <h4 className="font-semibold">Chat</h4>
               </div>
 
               {/* Chat messages */}
-              <div className="p-4 space-y-4 h-96 overflow-y-auto">
+              <div className="p-4 space-y-4 flex-1 overflow-y-auto">
                 {chats.length === 0 ? (
                   <div className="text-gray-500 text-center py-8">
                     아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
@@ -200,14 +200,14 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
             </div>
           </div>
 
-          {/* Right Section - AI 근거 히스토리 */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+          {/* Right Section - AI 근거 히스토리 (1/3 width) */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-white rounded-lg border border-gray-200 shadow overflow-hidden h-full flex flex-col">
               <div className="bg-blue-500 text-white px-4 py-3">
                 <h3 className="font-semibold">AI 근거 히스토리</h3>
               </div>
 
-              <div className="p-6 space-y-6">
+              <div className="p-6 space-y-6 flex-1 flex flex-col">
                 {/* Pie chart with text */}
                 <div className="text-center">
                   <div className="relative w-32 h-32 mx-auto mb-4">
@@ -246,11 +246,15 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                 </div>
 
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">이번 근거</span>
-                  <span className="text-gray-500">다음 근거</span>
+                  <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-xs">
+                    이번 근거
+                  </button>
+                  <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-xs">
+                    다음 근거
+                  </button>
                 </div>
 
-                <button className="w-full bg-blue-500 text-white py-3 px-4 rounded-md text-sm hover:bg-blue-600">
+                <button className="w-full bg-blue-500 text-white py-3 px-4 rounded-md text-sm hover:bg-blue-600 mt-auto">
                   데이터 출처에서 내 주장 근거 찾기
                 </button>
               </div>
@@ -272,7 +276,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* 우세한 의견의 주요 주장 section */}
-            <div className="bg-white rounded-lg shadow">
+            <div className="bg-white rounded-lg border border-gray-200 shadow">
               <div className="bg-blue-500 text-white px-4 py-2 rounded-t-lg">
                 <h3 className="font-semibold">우세한 의견</h3>
               </div>
@@ -294,7 +298,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
             </div>
 
             {/* 반대 의견의 주요 주장 section */}
-            <div className="bg-white rounded-lg shadow">
+            <div className="bg-white rounded-lg border border-gray-200 shadow">
               <div className="bg-gray-500 text-white px-4 py-2 rounded-t-lg">
                 <h3 className="font-semibold">반대 의견</h3>
               </div>
@@ -317,7 +321,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
           {/* 뜻밖의 근거와 반박 근거 section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
             {/* 뜻밖의 근거 section */}
-            <div className="bg-white rounded-lg shadow">
+            <div className="bg-white rounded-lg border border-gray-200 shadow">
               <div className="p-4 border-b">
                 <div className="flex items-center space-x-2">
                   <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
@@ -365,7 +369,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
             </div>
 
             {/* 반박 근거 section */}
-            <div className="bg-white rounded-lg shadow">
+            <div className="bg-white rounded-lg border border-gray-200 shadow">
               <div className="p-4 border-b">
                 <div className="flex items-center space-x-2">
                   <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
