@@ -6,6 +6,8 @@ import { createRoot } from "react-dom/client";
 
 import Layout from "./components/layouts";
 
+import { PhoenixSocketProvider } from "./lib/phoenixSocketContext";
+
 axios.defaults.xsrfHeaderName = "x-csrf-token";
 
 createInertiaApp({
@@ -16,6 +18,10 @@ createInertiaApp({
     return page;
   },
   setup({ App, el, props }) {
-    createRoot(el).render(<App {...props} />);
+    createRoot(el).render(
+      <PhoenixSocketProvider>
+        <App {...props} />
+      </PhoenixSocketProvider>,
+    );
   },
 });
