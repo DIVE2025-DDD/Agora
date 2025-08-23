@@ -70,7 +70,7 @@ const RegisterPage = (props: RegisterProps) => {
                   className="h-16 mx-auto hover:scale-105 transition-transform duration-200"
                 />
               </Link>
-              <h1 className="text-2xl font-bold text-undp-text mb-2">
+              <h1 className="text-2xl font-bold text-gray-800 mb-2">
                 회원가입
               </h1>
             </div>
@@ -94,7 +94,7 @@ const RegisterPage = (props: RegisterProps) => {
                     type="email"
                     value={data.email}
                     onChange={(e) => setData("email", e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-undp-blue focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors"
                     placeholder="이메일을 입력하세요"
                     required
                   />
@@ -119,7 +119,7 @@ const RegisterPage = (props: RegisterProps) => {
                     type="text"
                     value={data.nickname}
                     onChange={(e) => setData("nickname", e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-undp-blue focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors"
                     placeholder="닉네임을 입력하세요"
                     required
                   />
@@ -160,7 +160,7 @@ const RegisterPage = (props: RegisterProps) => {
                         setPasswordError("");
                       }
                     }}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-undp-blue focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors"
                     placeholder="비밀번호를 입력하세요"
                     required
                   />
@@ -206,7 +206,7 @@ const RegisterPage = (props: RegisterProps) => {
                         setPasswordError("");
                       }
                     }}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-undp-blue focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors"
                     placeholder="비밀번호를 다시 입력하세요"
                     required
                   />
@@ -236,7 +236,7 @@ const RegisterPage = (props: RegisterProps) => {
                 className={`w-full py-3 px-4 rounded-lg font-medium text-white transition-colors ${
                   processing
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-undp-blue hover:bg-undp-dark-blue"
+                    : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
                 {processing ? "가입 중..." : "회원가입"}
@@ -249,7 +249,7 @@ const RegisterPage = (props: RegisterProps) => {
                 이미 계정이 있으신가요?{" "}
                 <Link
                   href="/login"
-                  className="text-undp-blue hover:text-undp-dark-blue font-medium"
+                  className="text-blue-600 hover:text-blue-800 font-medium"
                 >
                   로그인
                 </Link>

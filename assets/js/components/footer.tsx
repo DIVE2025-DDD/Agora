@@ -11,7 +11,7 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-undp-dark-blue text-white">
+    <footer className="bg-blue-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* 브랜드 정보 */}
@@ -23,15 +23,15 @@ const Footer = () => {
                 className="h-12 w-auto"
               />
               <div>
-                <h5 className="text-xl font-bold">UNDP 데이터 분석 시스템</h5>
+                <h5 className="text-xl font-bold">데이터 분석 시스템</h5>
                 <p className="text-sm text-white/70">
                   지속가능한 미래를 위한 데이터 분석
                 </p>
               </div>
             </div>
             <p className="text-white/80 mb-6 leading-relaxed text-sm">
-              유엔개발계획(UNDP)의 데이터 분석 플랫폼으로, AI 기반 분석을 통해
-              지속가능발전목표(SDGs) 달성을 위한 인사이트를 제공합니다.
+              데이터 분석 플랫폼으로, AI 기반 분석을 통해 달성을 위한 인사이트를
+              제공합니다.
             </p>
             <div className="flex space-x-4">
               <a
@@ -138,7 +138,7 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-white/60 text-sm">
-              © 2025 UNDP Hackerton TEAM. All rights reserved.
+              © 2025 DEEP DIVE Hackerton TEAM. All rights reserved.
             </p>
             <div className="flex space-x-6 text-sm">
               <a

@@ -58,7 +58,7 @@ const LoginPage = (props: LoginProps) => {
                   className="h-16 mx-auto hover:scale-105 transition-transform duration-200"
                 />
               </Link>
-              <h1 className="text-2xl font-bold text-undp-text mb-2">로그인</h1>
+              <h1 className="text-2xl font-bold text-gray-800 mb-2">로그인</h1>
             </div>
 
             {/* Login Form */}
@@ -80,7 +80,7 @@ const LoginPage = (props: LoginProps) => {
                     type="email"
                     value={data.email}
                     onChange={(e) => setData("email", e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-undp-blue focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors"
                     placeholder="이메일을 입력하세요"
                     required
                   />
@@ -105,7 +105,7 @@ const LoginPage = (props: LoginProps) => {
                     type={showPassword ? "text" : "password"}
                     value={data.password}
                     onChange={(e) => setData("password", e.target.value)}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-undp-blue focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors"
                     placeholder="비밀번호를 입력하세요"
                     required
                   />
@@ -131,7 +131,7 @@ const LoginPage = (props: LoginProps) => {
                     type="checkbox"
                     checked={data.remember}
                     onChange={(e) => setData("remember", e.target.checked)}
-                    className="h-4 w-4 text-undp-blue focus:ring-undp-blue border-gray-300 rounded"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-600 border-gray-300 rounded"
                   />
                   <span className="ml-2 text-sm text-gray-700">
                     로그인 상태 유지
@@ -139,7 +139,7 @@ const LoginPage = (props: LoginProps) => {
                 </label>
                 <Link
                   href="/reset_password"
-                  className="text-sm text-undp-blue hover:text-undp-dark-blue font-medium"
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                 >
                   비밀번호 찾기
                 </Link>
@@ -152,7 +152,7 @@ const LoginPage = (props: LoginProps) => {
                 className={`w-full py-3 px-4 rounded-lg font-medium text-white transition-colors ${
                   processing
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-undp-blue hover:bg-undp-dark-blue"
+                    : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
                 {processing ? "로그인 중..." : "로그인"}
@@ -165,7 +165,7 @@ const LoginPage = (props: LoginProps) => {
                 계정이 없으신가요?{" "}
                 <Link
                   href="/register"
-                  className="text-undp-blue hover:text-undp-dark-blue font-medium"
+                  className="text-blue-600 hover:text-blue-800 font-medium"
                 >
                   회원가입
                 </Link>
