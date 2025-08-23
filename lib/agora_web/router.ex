@@ -34,6 +34,7 @@ defmodule AgoraWeb.Router do
     pipe_through [:browser, :auth_optional]
 
     get "/", PageController, :home
+    get "/forum/:id/detail", ForumController, :index
   end
 
   scope "/", AgoraWeb do
