@@ -35,6 +35,7 @@ defmodule AgoraWeb.Router do
 
     get "/", PageController, :home
     get "/forum/save", ForumController, :save
+    post "/forum/save", ForumController, :save_post
     get "/forum/:id/detail", ForumController, :index
   end
 

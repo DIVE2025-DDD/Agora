@@ -51,6 +51,12 @@
         line-height: 1.2;
         letter-spacing: 0;
     }
+    .ag-title-20-m {
+        @apply font-medium;
+        font-size: 2rem;
+        line-height: 1;
+        letter-spacing: 0;
+    }
 
     .ag-body-23-b {
         @apply font-bold;

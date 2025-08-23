@@ -65,7 +65,7 @@ const RegisterPage = (props: RegisterProps) => {
             <div className="text-center mb-8">
               <Link href="/" className="inline-block mb-4">
                 <img
-                  src="/images/logo.svg"
+                  src="/images/logo.png"
                   alt="UNDP DataBridge"
                   className="h-16 mx-auto hover:scale-105 transition-transform duration-200"
                 />
