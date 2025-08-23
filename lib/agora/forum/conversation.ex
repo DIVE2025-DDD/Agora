@@ -12,6 +12,7 @@ defmodule Agora.Forum.Conversation do
   @doc false
   def changeset(conversation, attrs) do
     conversation
-    |> cast(attrs, [])
+    |> cast(attrs, [:forum_id])
+    |> validate_required([:forum_id])
   end
 end

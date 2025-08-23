@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Link } from "@inertiajs/react";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { Link, usePage } from "@inertiajs/react";
+import { PhoenixSocketContext } from "../lib/phoenixSocketContext";
 
 interface User {
   id: number;
@@ -32,17 +33,97 @@ interface Forum {
 
 interface ForumDetailPageProps {
   forum: Forum | null;
+  user?: {
+    id: number;
+    email: string;
+  }
 }
 
 const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
+  const { props } = usePage();
+  const user = props.user;
   const [message, setMessage] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [channel, setChannel] = useState<any>(null);
+  const socket = useContext(PhoenixSocketContext);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (forum?.conversation?.chats) {
+      setChats(forum.conversation.chats);
+    }
+  }, [forum]);
+
+  useEffect(() => {
+    if (!socket || !forum) return;
+
+    // Join the forum-specific channel
+    const channelTopic = `room:forum:${forum.id}`;
+    const newChannel = socket.channel(channelTopic, {});
+
+    newChannel.join()
+      .receive("ok", resp => { 
+        console.log("Joined successfully", resp);
+        setChannel(newChannel);
+      })
+      .receive("error", resp => { 
+        console.log("Unable to join", resp);
+      });
+
+    // Listen for new messages
+    newChannel.on("new_message", (payload) => {
+      console.log("New message received:", payload);
+      setChats(prevChats => [...prevChats, payload.chat]);
+    });
+
+    return () => {
+      newChannel.leave();
+      setChannel(null);
+    };
+  }, [socket, forum]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chats]);
+
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  };
+
+  const handleSendMessage = () => {
+    if (!message.trim() || !channel || !user) return;
+
+    const messageToSend = message.trim();
+    setMessage(""); // 즉시 입력창 초기화
+    
+    channel.push("new_message", {
+      message: messageToSend,
+      user_id: user.id
+    })
+    .receive("ok", (response) => {
+      console.log("Message sent successfully", response);
+      scrollToBottom();
+    })
+    .receive("error", (response) => {
+      console.log("Error sending message", response);
+      setMessage(messageToSend); // 실패시 메시지 복원
+    });
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
   if (!forum) {
     return <div>포럼을 찾을 수 없습니다.</div>;
   }
-
-  const chats = forum.conversation?.chats || [];
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('ko-KR');
   };
@@ -124,14 +205,14 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Section - Chat (2/3 width) */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-lg border border-gray-200 shadow overflow-hidden h-full flex flex-col">
+            <div className="bg-white rounded-lg border border-gray-200 shadow overflow-hidden flex flex-col" style={{ height: '500px' }}>
               {/* Chat header */}
               <div className="bg-blue-500 text-white px-4 py-3">
                 <h4 className="font-semibold">Chat</h4>
               </div>
 
               {/* Chat messages */}
-              <div className="p-4 space-y-4 flex-1 overflow-y-auto">
+              <div ref={chatContainerRef} className="p-4 space-y-4 flex-1 overflow-y-auto max-h-96">
                 {chats.length === 0 ? (
                   <div className="text-gray-500 text-center py-8">
                     아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
@@ -168,34 +249,47 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                       </div>
                     ))
                 )}
+                <div ref={messagesEndRef} />
               </div>
 
               {/* Chat input */}
               <div className="p-4 border-t">
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="주제에 대한 의견을 남겨 주세요!"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex-shrink-0">
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                {user ? (
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="주제에 대한 의견을 남겨 주세요!"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      disabled={!channel}
+                    />
+                    <button 
+                      onClick={handleSendMessage}
+                      disabled={!message.trim() || !channel}
+                      className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md flex-shrink-0"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                      />
-                    </svg>
-                  </button>
-                </div>
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center text-gray-500">
+                    로그인 후 댓글을 작성할 수 있습니다.
+                  </div>
+                )}
               </div>
             </div>
           </div>

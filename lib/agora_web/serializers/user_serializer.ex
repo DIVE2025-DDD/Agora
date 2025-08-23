@@ -6,6 +6,8 @@ defmodule AgoraWeb.UserSerializer do
     }
   end
 
+  def to_map(nil), do: nil
+
   def assign_prop(conn, name, user) do
     Inertia.Controller.assign_prop(conn, name, fn -> user && to_map(user) end)
   end
