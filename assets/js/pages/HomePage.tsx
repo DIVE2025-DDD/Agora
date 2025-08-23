@@ -1,82 +1,96 @@
-import React, { useState } from "react";
-import { Link } from "@inertiajs/react";
-import { useChannel } from "../lib/useChannel";
+import React from "react";
+import { MessageCircle, Eye, ChevronDown } from "lucide-react";
+import Button from "@/components/Button";
 
 const HomePage = () => {
-  const [text, setText] = useState("");
-
-  const [incomingMessage, send] = useChannel(
-    "room:lobby",
-    (lastMessage, channelMessage) => {
-      switch (channelMessage.event) {
-        case "shout":
-          return channelMessage.payload.messageText;
-
-        default:
-          return lastMessage;
-      }
-    },
-    ""
-  );
-
-  const test = () => {
-    send("shout", { messageText: text });
-    setText("");
-  };
+  const discussions = Array(7)
+    .fill(null)
+    .map((_, i) => ({
+      id: i + 1,
+      title: "토론 주제 어쩌고 어쩌고 좋아합니다",
+      author: "토론 마감일",
+      timestamp: "24시간 전",
+      deadline: "2025.07.31",
+      comments: 151,
+      views: 151,
+    }));
 
   return (
-    <>
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 p-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl font-bold text-blue-50 mb-6 text-center">
-            Welcome to the Home Page!
-          </h1>
-          <p className="text-xl text-white/90 mb-8 text-center leading-relaxed">
-            This is the home page of our application.
-          </p>
-          
-          {/* 소켓 테스트 섹션 */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Socket Test</h2>
-            
-            <div className="mb-4">
-              <label className="block text-white mb-2">Enter message:</label>
-              <input
-                type="text"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                className="w-full px-3 py-2 rounded border bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50"
-                placeholder="Type your message..."
-                onKeyPress={(e) => e.key === 'Enter' && test()}
-              />
-            </div>
-            
-            <button
-              onClick={test}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-semibold transition-colors duration-200 mb-4"
-            >
-              Send Message
-            </button>
-            
-            <div className="bg-black/30 rounded p-4 min-h-[100px]">
-              <p className="text-white/90 font-semibold mb-2">Last received message:</p>
-              <p className="text-green-300 font-mono">
-                {incomingMessage || "No messages yet..."}
-              </p>
+    <div className="min-h-screen bg-ag-gray-100 text-ag-gray-900">
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto">
+        <div className="rounded-lg shadow-sm">
+          {/* Page Title */}
+          <div className="px-6 py-6">
+            <h1 className="text-2xl font-bold text-gray-900">토론하기</h1>
+          </div>
+
+          {/* Category Tabs */}
+          <div className="px-6 py-4 border-b border-gray-400">
+            <div className="flex space-x-6">
+              <button className="text-ag-primary-50 pb-2">카테고리1</button>
+              <button className="text-gray-500 hover:text-blue-600 pb-2">
+                카테고리2
+              </button>
+              <button className="text-gray-500 hover:text-blue-600 pb-2">
+                카테고리3
+              </button>
+              <button className="text-gray-500 hover:text-blue-600 pb-2">
+                카테고리4
+              </button>
             </div>
           </div>
 
-          <div className="flex justify-center">
-            <Link
-              href="/about"
-              className="bg-white text-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200 shadow-lg"
-            >
-              About
-            </Link>
+          {/* Controls */}
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">검색 결과 21건</div>
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-1 text-sm text-gray-600 cursor-pointer">
+                  <span>최신순</span>
+                  <ChevronDown className="w-4 h-4" />
+                </div>
+                <Button variant="primary" size="sm">
+                  주제 등록하기
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Discussion List */}
+          <div className="flex flex-col gap-2">
+            {discussions.map((discussion) => (
+              <div
+                key={discussion.id}
+                className="px-6 py-4 bg-ag-gray-50 hover:bg-gray-50 cursor-pointer rounded-ag"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-gray-900 font-medium mb-2">
+                      {discussion.title}
+                    </h3>
+                    <div className="text-sm text-gray-500">
+                      {discussion.timestamp} · {discussion.author}:{" "}
+                      {discussion.deadline}
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4 ml-4">
+                    <div className="flex items-center space-x-1 text-sm text-gray-500">
+                      <MessageCircle className="w-4 h-4" />
+                      <span>{discussion.comments}</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-sm text-gray-500">
+                      <Eye className="w-4 h-4" />
+                      <span>{discussion.views}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-    </>
+      </main>
+    </div>
   );
 };
 

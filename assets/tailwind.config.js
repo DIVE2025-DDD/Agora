@@ -1,6 +1,4 @@
-// See the Tailwind configuration guide for advanced usage
-// https://tailwindcss.com/docs/configuration
-
+// tailwind.config.js (기존 파일 수정본)
 const plugin = require("tailwindcss/plugin");
 const fs = require("fs");
 const path = require("path");
@@ -17,17 +15,41 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brand: "#FD4F00",
+        brand: "#FD4F00", // (기존값 유지)
+        ag: {
+          primary: {
+            50: "var(--ag-primary-50)",
+            100: "var(--ag-primary-100)",
+            200: "var(--ag-primary-200)",
+          },
+          secondary: "var(--ag-secondary)",
+          success: "var(--ag-success)",
+          error: "var(--ag-error)",
+          gray: {
+            50: "var(--ag-gray-50)",
+            100: "var(--ag-gray-100)",
+            200: "var(--ag-gray-200)",
+            300: "var(--ag-gray-300)",
+            400: "var(--ag-gray-400)",
+            500: "var(--ag-gray-500)",
+            600: "var(--ag-gray-600)",
+            700: "var(--ag-gray-700)",
+            800: "var(--ag-gray-800)",
+            900: "var(--ag-gray-900)",
+            1000: "var(--ag-gray-1000)",
+          },
+        },
+      },
+      borderRadius: {
+        ag: "var(--ag-radius)",
+      },
+      boxShadow: {
+        card: "0 1px 2px rgba(0,0,0,0.06)",
       },
     },
   },
   plugins: [
     require("@tailwindcss/forms"),
-    // Allows prefixing tailwind classes with LiveView classes to add rules
-    // only when LiveView classes are applied, for example:
-    //
-    //     <div class="phx-click-loading:animate-ping">
-    //
     plugin(({ addVariant }) =>
       addVariant("phx-click-loading", [
         ".phx-click-loading&",
@@ -46,10 +68,6 @@ module.exports = {
         ".phx-change-loading &",
       ]),
     ),
-
-    // Embeds Heroicons (https://heroicons.com) into your app.css bundle
-    // See your `CoreComponents.icon/1` for more information.
-    //
     plugin(function ({ matchComponents, theme }) {
       let iconsDir = path.join(__dirname, "../deps/heroicons/optimized");
       let values = {};
@@ -73,11 +91,8 @@ module.exports = {
               .toString()
               .replace(/\r?\n|\r/g, "");
             let size = theme("spacing.6");
-            if (name.endsWith("-mini")) {
-              size = theme("spacing.5");
-            } else if (name.endsWith("-micro")) {
-              size = theme("spacing.4");
-            }
+            if (name.endsWith("-mini")) size = theme("spacing.5");
+            else if (name.endsWith("-micro")) size = theme("spacing.4");
             return {
               [`--hero-${name}`]: `url('data:image/svg+xml;utf8,${content}')`,
               "-webkit-mask": `var(--hero-${name})`,

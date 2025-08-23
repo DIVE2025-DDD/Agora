@@ -1,14 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Link, usePage, useForm } from "@inertiajs/react";
-import {
-  BarChart3,
-  LogIn,
-  UserPlus,
-  LogOut,
-  ChevronDown,
-  User,
-  Globe,
-} from "lucide-react";
+import React, {useEffect, useRef, useState} from "react";
+import {Link, useForm, usePage} from "@inertiajs/react";
+import {ChevronDown, LogOut, User, UserPlus,} from "lucide-react";
 
 const Header = () => {
   const { props } = usePage();
@@ -38,19 +30,23 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
-          <Link href="/" className="flex items-center space-x-3">
-            <img src="/images/logo.svg" alt="" className="h-16 w-auto" />
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl font-bold text-blue-600"></span>
-              <span className="text-2xl font-light text-gray-700">
-                데이터 분석 시스템
-              </span>
-            </div>
-          </Link>
-
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center space-x-8">
+            <div className="text-2xl font-bold text-blue-600">Agora</div>
+            <nav className="flex space-x-6">
+              <a
+                href="#"
+                className="text-gray-700 hover:text-blue-600 font-medium"
+              >
+                토론
+              </a>
+              <a href="#" className="text-gray-500 hover:text-blue-600">
+                아이디어
+              </a>
+            </nav>
+          </div>
           <div className="flex items-center space-x-4">
             {user ? (
               <div className="relative" ref={dropdownRef}>
@@ -100,9 +96,8 @@ const Header = () => {
                 </Link>
                 <Link
                   href="/login"
-                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+                  className="flex text-gray-500 hover:text-blue-600 cursor-pointer"
                 >
-                  <LogIn size={18} />
                   <span>로그인</span>
                 </Link>
               </div>
