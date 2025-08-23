@@ -36,7 +36,7 @@ interface ForumDetailPageProps {
   user?: {
     id: number;
     email: string;
-  }
+  };
 }
 
 const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
@@ -63,19 +63,20 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
     const channelTopic = `room:forum:${forum.id}`;
     const newChannel = socket.channel(channelTopic, {});
 
-    newChannel.join()
-      .receive("ok", resp => { 
+    newChannel
+      .join()
+      .receive("ok", (resp) => {
         console.log("Joined successfully", resp);
         setChannel(newChannel);
       })
-      .receive("error", resp => { 
+      .receive("error", (resp) => {
         console.log("Unable to join", resp);
       });
 
     // Listen for new messages
     newChannel.on("new_message", (payload) => {
       console.log("New message received:", payload);
-      setChats(prevChats => [...prevChats, payload.chat]);
+      setChats((prevChats) => [...prevChats, payload.chat]);
     });
 
     return () => {
@@ -90,7 +91,8 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   };
 
@@ -99,19 +101,20 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
 
     const messageToSend = message.trim();
     setMessage(""); // 즉시 입력창 초기화
-    
-    channel.push("new_message", {
-      message: messageToSend,
-      user_id: user.id
-    })
-    .receive("ok", (response) => {
-      console.log("Message sent successfully", response);
-      scrollToBottom();
-    })
-    .receive("error", (response) => {
-      console.log("Error sending message", response);
-      setMessage(messageToSend); // 실패시 메시지 복원
-    });
+
+    channel
+      .push("new_message", {
+        message: messageToSend,
+        user_id: user.id,
+      })
+      .receive("ok", (response) => {
+        console.log("Message sent successfully", response);
+        scrollToBottom();
+      })
+      .receive("error", (response) => {
+        console.log("Error sending message", response);
+        setMessage(messageToSend); // 실패시 메시지 복원
+      });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -125,7 +128,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
     return <div>포럼을 찾을 수 없습니다.</div>;
   }
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('ko-KR');
+    return new Date(dateString).toLocaleString("ko-KR");
   };
 
   return (
@@ -133,10 +136,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Back button and title */}
         <div className="flex items-center mb-6">
-          <Link
-            href="/forum"
-            className="mr-4 text-gray-600 hover:text-gray-900"
-          >
+          <Link href="/" className="mr-4 text-gray-600 hover:text-gray-900">
             <svg
               className="w-5 h-5"
               fill="none"
@@ -151,9 +151,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
               />
             </svg>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">
-            {forum.title}
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900">{forum.title}</h1>
         </div>
 
         {/* Subject content header */}
@@ -205,14 +203,20 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Section - Chat (2/3 width) */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-lg border border-gray-200 shadow overflow-hidden flex flex-col" style={{ height: '500px' }}>
+            <div
+              className="bg-white rounded-lg border border-gray-200 shadow overflow-hidden flex flex-col"
+              style={{ height: "500px" }}
+            >
               {/* Chat header */}
               <div className="bg-blue-500 text-white px-4 py-3">
                 <h4 className="font-semibold">Chat</h4>
               </div>
 
               {/* Chat messages */}
-              <div ref={chatContainerRef} className="p-4 space-y-4 flex-1 overflow-y-auto max-h-96">
+              <div
+                ref={chatContainerRef}
+                className="p-4 space-y-4 flex-1 overflow-y-auto max-h-96"
+              >
                 {chats.length === 0 ? (
                   <div className="text-gray-500 text-center py-8">
                     아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
@@ -244,7 +248,9 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                               {formatDate(chat.inserted_at)}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-700">{chat.message}</p>
+                          <p className="text-sm text-gray-700">
+                            {chat.message}
+                          </p>
                         </div>
                       </div>
                     ))
@@ -265,7 +271,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       disabled={!channel}
                     />
-                    <button 
+                    <button
                       onClick={handleSendMessage}
                       disabled={!message.trim() || !channel}
                       className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md flex-shrink-0"

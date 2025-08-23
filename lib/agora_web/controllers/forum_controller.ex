@@ -17,19 +17,8 @@ defmodule AgoraWeb.ForumController do
 
   # 작성 화면: 현재 로그인 사용자 정보를 페이지로 전달
   def save(conn, _params) do
-    current_user = conn.assigns[:current_user]
-
     conn
     |> assign(:page_title, "포럼 페이지 저장")
-    |> ForumSerializer.assign_prop(
-      :current_user,
-      current_user &&
-        %{
-          id: current_user.id,
-          name: Map.get(current_user, :name),
-          email: Map.get(current_user, :email)
-        }
-    )
     |> render_inertia("ForumSavePage")
   end
 

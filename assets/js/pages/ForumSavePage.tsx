@@ -11,8 +11,8 @@ type CurrentUser = {
 };
 
 const ForumSavePage = () => {
-  const { props } = usePage<{ current_user?: CurrentUser }>();
-  const currentUser = props.current_user;
+  const { props } = usePage();
+  const user = props.user;
 
   const [title, setTitle] = useState("");
   const [deadline, setDeadline] = useState<string>("");
@@ -42,10 +42,6 @@ const ForumSavePage = () => {
     }
   };
 
-  const displayAuthor =
-    (currentUser?.name && currentUser.name.trim()) ||
-    (currentUser?.email && currentUser.email.trim()) ||
-    "익명";
 
   return (
     <main className="max-w-6xl mx-auto px-6 py-8">
@@ -85,15 +81,6 @@ const ForumSavePage = () => {
             />
           </div>
 
-          {/* 작성자: 입력 대신 표시만 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              작성자
-            </label>
-            <div className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-gray-50">
-              {displayAuthor}
-            </div>
-          </div>
 
           {/* 마감일 */}
           <div>
