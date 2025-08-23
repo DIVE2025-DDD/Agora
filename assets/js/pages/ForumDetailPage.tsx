@@ -224,36 +224,53 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                 ) : (
                   chats
                     .sort((a, b) => a.sequence - b.sequence)
-                    .map((chat) => (
-                      <div key={chat.id} className="flex items-start space-x-3">
-                        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                          <svg
-                            className="w-4 h-4"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-1">
-                            <span className="text-xs font-medium text-gray-600">
-                              {chat.user.email}
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              {formatDate(chat.inserted_at)}
-                            </span>
+                    .map((chat) => {
+                      const isMyMessage = user && chat.user.id === user.id;
+                      
+                      return (
+                        <div 
+                          key={chat.id} 
+                          className={`flex items-start space-x-3 ${
+                            isMyMessage ? "flex-row-reverse space-x-reverse" : ""
+                          }`}
+                        >
+                          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg
+                              className="w-4 h-4"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
                           </div>
-                          <p className="text-sm text-gray-700">
-                            {chat.message}
-                          </p>
+                          <div className="flex-1">
+                            <div className={`flex items-center space-x-2 mb-1 ${
+                              isMyMessage ? "flex-row-reverse space-x-reverse" : ""
+                            }`}>
+                              <span className="text-xs font-medium text-gray-600">
+                                {chat.user.email}
+                              </span>
+                              <span className="text-xs text-gray-400">
+                                {formatDate(chat.inserted_at)}
+                              </span>
+                            </div>
+                            <div className={`${isMyMessage ? "text-right" : ""}`}>
+                              <p className={`text-sm text-gray-700 inline-block px-3 py-2 rounded-lg ${
+                                isMyMessage 
+                                  ? "bg-blue-500 text-white" 
+                                  : "bg-gray-100"
+                              }`}>
+                                {chat.message}
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                 )}
                 <div ref={messagesEndRef} />
               </div>
