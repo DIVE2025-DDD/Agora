@@ -1,6 +1,8 @@
 defmodule AgoraWeb.Router do
   use AgoraWeb, :router
 
+  import AgoraWeb.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,7 +10,20 @@ defmodule AgoraWeb.Router do
     plug :put_root_layout, html: {AgoraWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
     plug Inertia.Plug
+  end
+
+  pipeline :authenticated do
+    plug AgoraWeb.AuthPlug, :user_required
+  end
+
+  pipeline :unauthenticated do
+    plug AgoraWeb.AuthPlug, :no_user
+  end
+
+  pipeline :auth_optional do
+    plug AgoraWeb.AuthPlug, :user_optional
   end
 
   pipeline :api do
@@ -16,9 +31,25 @@ defmodule AgoraWeb.Router do
   end
 
   scope "/", AgoraWeb do
-    pipe_through :browser
+    pipe_through [:browser, :auth_optional]
 
     get "/", PageController, :home
+  end
+
+  scope "/", AgoraWeb do
+    pipe_through [:browser, :unauthenticated]
+
+    get "/register", RegisterController, :index
+    post "/register", RegisterController, :register
+
+    get "/login", LoginController, :index
+    post "/login", LoginController, :login
+  end
+
+  scope "/", AgoraWeb do
+    pipe_through [:browser, :authenticated]
+
+    delete "/users/log_out", UserSessionController, :delete
   end
 
   # Other scopes may use custom stacks.

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Architecture
 
-This is a Phoenix/Elixir web application called "Agora" that uses Inertia.js with React for the frontend. The application appears to be focused on data analysis and sustainability reporting, particularly for UNDP (United Nations Development Programme) related projects.
+This is a Phoenix/Elixir web application called "Agora" that uses Inertia.js with React for the frontend. The application appears to be focused on data analysis and sustainability reporting, particularly for related projects.
 
 ### Key Technologies
 - **Backend**: Phoenix 1.7.18, Elixir (~> 1.14)
@@ -95,6 +95,5 @@ Frontend components should:
 ## Development Notes
 
 - The application uses Korean text and appears focused on sustainability/SDG reporting
-- Custom Tailwind colors are configured (undp-blue, undp-sky, etc.)
 - The build process compiles JSX to ES modules with code splitting
 - Live reload is configured for development

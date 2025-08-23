@@ -4,7 +4,7 @@ import { Link } from "@inertiajs/react";
 const HomePage = () => {
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-undp-blue to-undp-sky p-8">
+      <div className="min-h-screen bg-gradient-to-br p-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl font-bold text-blue-50 mb-6 text-center">
             Welcome to the Home Page!
