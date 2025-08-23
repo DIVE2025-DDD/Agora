@@ -49,6 +49,9 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
   const socket = useContext(PhoenixSocketContext);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [isEvidenceMode, setIsEvidenceMode] = useState(false);
+  const [selectedChats, setSelectedChats] = useState<number[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     if (forum?.conversation?.chats) {
@@ -121,6 +124,78 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    }
+  };
+
+  const handleChatSelection = (chatId: number) => {
+    if (!isEvidenceMode) return;
+
+    setSelectedChats(prev =>
+      prev.includes(chatId)
+        ? prev.filter(id => id !== chatId)
+        : [...prev, chatId]
+    );
+  };
+
+  const handleEvidenceSearch = () => {
+    if (!isEvidenceMode) {
+      // 증거 검색 모드 활성화
+      setIsEvidenceMode(true);
+      setSelectedChats([]);
+    } else {
+      // 선택된 채팅들로 AI 응답 생성
+      if (selectedChats.length === 0) return;
+
+      setIsGenerating(true);
+
+      // 샘플 데이터로 처리
+      setTimeout(() => {
+        const selectedChatData = chats.filter(chat => selectedChats.includes(chat.id));
+
+        // 랜덤하게 차트 또는 메시지 타입 결정
+        const isChart = Math.random() > 0.5;
+
+        let aiResponse: Chat;
+
+        if (isChart) {
+          // 차트 응답
+          aiResponse = {
+            id: Date.now(),
+            message: "CHART_DATA",
+            sequence: chats.length + 1,
+            inserted_at: new Date().toISOString(),
+            user: {
+              id: -1,
+              email: 'AI Assistant'
+            }
+          };
+        } else {
+          // 메시지 응답
+          const sampleMessages = [
+            "선택하신 의견들을 분석한 결과, 지속가능성 측면에서 긍정적인 효과가 예상됩니다. 특히 환경적 영향을 고려할 때 2025년까지 약 15%의 개선 효과를 기대할 수 있습니다.",
+            "제시된 논점들을 종합해보면, 경제적 타당성과 환경적 지속가능성 사이의 균형이 중요합니다. 데이터에 따르면 장기적으로 투자 대비 효과가 높을 것으로 예측됩니다.",
+            "분석 결과, 선택하신 의견들은 SDG 목표 달성에 직접적으로 기여할 수 있는 방향성을 제시하고 있습니다. 구체적인 실행 계획이 필요한 상황입니다."
+          ];
+
+          aiResponse = {
+            id: Date.now(),
+            message: sampleMessages[Math.floor(Math.random() * sampleMessages.length)],
+            sequence: chats.length + 1,
+            inserted_at: new Date().toISOString(),
+            user: {
+              id: -1,
+              email: 'AI Assistant'
+            }
+          };
+        }
+
+        setChats(prev => [...prev, aiResponse]);
+
+        // 모드 리셋
+        setIsEvidenceMode(false);
+        setSelectedChats([]);
+        setIsGenerating(false);
+      }, 2000); // 2초 딜레이로 로딩 효과
     }
   };
 
@@ -215,7 +290,9 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
               {/* Chat messages */}
               <div
                 ref={chatContainerRef}
-                className="p-4 space-y-4 flex-1 overflow-y-auto max-h-96"
+                className={`p-4 space-y-4 flex-1 overflow-y-auto max-h-96 ${
+                  isEvidenceMode ? "bg-gray-100" : ""
+                }`}
               >
                 {chats.length === 0 ? (
                   <div className="text-gray-500 text-center py-8">
@@ -226,13 +303,21 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                     .sort((a, b) => a.sequence - b.sequence)
                     .map((chat) => {
                       const isMyMessage = user && chat.user.id === user.id;
+                      const isSelected = selectedChats.includes(chat.id);
 
                       return (
-                        <div
-                          key={chat.id}
-                          className={`flex items-start space-x-3 ${
+                        <div 
+                          key={chat.id} 
+                          className={`flex items-start space-x-3 p-3 rounded-lg transition-colors ${
                             isMyMessage ? "flex-row-reverse space-x-reverse" : ""
+                          } ${
+                            isEvidenceMode 
+                              ? `cursor-pointer hover:opacity-75 ${
+                                  isSelected ? "bg-white shadow-md" : "bg-gray-400"
+                                }` 
+                              : ""
                           }`}
+                          onClick={() => isEvidenceMode && handleChatSelection(chat.id)}
                         >
                           <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
                             <svg
@@ -259,13 +344,67 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                               </span>
                             </div>
                             <div className={`${isMyMessage ? "text-right" : ""}`}>
-                              <p className={`text-sm text-gray-700 inline-block px-3 py-2 rounded-lg ${
-                                isMyMessage 
-                                  ? "bg-blue-500 text-white" 
-                                  : "bg-gray-100"
-                              }`}>
-                                {chat.message}
-                              </p>
+                              {chat.message === "CHART_DATA" ? (
+                                <div className="inline-block p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                                  <div className="text-center mb-3">
+                                    <h4 className="text-sm font-semibold text-gray-800 mb-2">데이터 분석 결과</h4>
+                                    <div className="relative w-24 h-24 mx-auto">
+                                      <svg
+                                        className="w-24 h-24 transform -rotate-90"
+                                        viewBox="0 0 36 36"
+                                      >
+                                        <path
+                                          className="text-gray-300"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeWidth="3"
+                                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        />
+                                        <path
+                                          className="text-blue-500"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeWidth="3"
+                                          strokeDasharray="72, 100"
+                                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        />
+                                      </svg>
+                                      <div className="absolute inset-0 flex items-center justify-center">
+                                        <span className="text-sm font-semibold">72%</span>
+                                      </div>
+                                    </div>
+                                    <p className="text-xs text-gray-600 mt-2">
+                                      선택된 의견들의 긍정적 지지율
+                                    </p>
+                                  </div>
+                                  <div className="text-xs text-gray-500 space-y-1">
+                                    <div className="flex justify-between">
+                                      <span>찬성 의견:</span>
+                                      <span className="font-medium">72%</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>반대 의견:</span>
+                                      <span className="font-medium">28%</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>신뢰도:</span>
+                                      <span className="font-medium text-green-600">높음</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <p className={`text-sm inline-block px-3 py-2 rounded-lg transition-colors ${
+                                  isEvidenceMode
+                                    ? "text-gray-700"
+                                    : chat.user.id === -1
+                                      ? "bg-green-100 text-gray-800 border border-green-200"
+                                      : isMyMessage 
+                                        ? "bg-blue-500 text-white" 
+                                        : "bg-gray-100 text-gray-700"
+                                }`}>
+                                  {chat.message}
+                                </p>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -371,8 +510,23 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                   </button>
                 </div>
 
-                <button className="w-full bg-blue-500 text-white py-3 px-4 rounded-md text-sm hover:bg-blue-600 mt-auto">
-                  데이터 출처에서 내 주장 근거 찾기
+                <button
+                  className={`w-full py-3 px-4 rounded-md text-sm mt-auto transition-colors ${
+                    isEvidenceMode
+                      ? selectedChats.length > 0 && !isGenerating
+                        ? "bg-green-500 hover:bg-green-600 text-white"
+                        : "bg-gray-400 text-white cursor-not-allowed"
+                      : "bg-blue-500 hover:bg-blue-600 text-white"
+                  }`}
+                  onClick={handleEvidenceSearch}
+                  disabled={isEvidenceMode && (selectedChats.length === 0 || isGenerating)}
+                >
+                  {isGenerating
+                    ? "생성 중..."
+                    : isEvidenceMode
+                      ? "생성하기"
+                      : "데이터 출처에서 내 주장 근거 찾기"
+                  }
                 </button>
               </div>
             </div>
