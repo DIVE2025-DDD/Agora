@@ -12,4 +12,10 @@ defmodule AgoraWeb.ForumController do
     |> ForumSerializer.assign_prop(:forum, forum)
     |> render_inertia("ForumDetailPage")
   end
+
+  def save(conn, _params) do
+    conn
+    |> assign(:page_title, "포럼 페이지 저장")
+    |> render_inertia("ForumSavePage")
+  end
 end

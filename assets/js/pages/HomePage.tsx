@@ -27,17 +27,13 @@ const HomePage = () => {
 
           {/* Category Tabs */}
           <div className="px-6 py-4 border-b border-gray-400">
-            <div className="flex space-x-6">
-              <button className="text-ag-primary-50 pb-2">카테고리1</button>
-              <button className="text-gray-500 hover:text-blue-600 pb-2">
-                카테고리2
-              </button>
-              <button className="text-gray-500 hover:text-blue-600 pb-2">
-                카테고리3
-              </button>
-              <button className="text-gray-500 hover:text-blue-600 pb-2">
-                카테고리4
-              </button>
+            <div className="flex space-x-6 pb-2">
+              <Button
+                variant="ghost"
+                className="text-ag-gray-500 hover:text-ag-primary-50"
+              >
+                정책
+              </Button>
             </div>
           </div>
 
@@ -50,7 +46,7 @@ const HomePage = () => {
                   <span>최신순</span>
                   <ChevronDown className="w-4 h-4" />
                 </div>
-                <Button variant="primary" size="sm">
+                <Button href="/forum/save" as="a" variant="primary" size="sm">
                   주제 등록하기
                 </Button>
               </div>
