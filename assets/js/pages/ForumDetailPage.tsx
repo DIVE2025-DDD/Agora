@@ -55,6 +55,8 @@ const ForumDetailPage = ({ forum, sample_message }: ForumDetailPageProps) => {
   const [selectedChats, setSelectedChats] = useState<number[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState("");
+  const [evidenceHistory, setEvidenceHistory] = useState<any[]>([]);
+  const [currentEvidenceIndex, setCurrentEvidenceIndex] = useState(0);
 
   useEffect(() => {
     if (forum?.conversation?.chats) {
@@ -119,6 +121,13 @@ const ForumDetailPage = ({ forum, sample_message }: ForumDetailPageProps) => {
           },
         };
         return [...prevChats, aiResponse];
+      });
+
+      // 증거 히스토리에 추가
+      setEvidenceHistory((prev) => {
+        const newHistory = [...prev, { message: payload.content, type: "message" }];
+        setCurrentEvidenceIndex(newHistory.length - 1);
+        return newHistory;
       });
       
       // 모드 리셋
@@ -217,6 +226,117 @@ const ForumDetailPage = ({ forum, sample_message }: ForumDetailPageProps) => {
           setSelectedChats([]);
         });
     }
+  };
+
+  const handlePreviousEvidence = () => {
+    if (currentEvidenceIndex > 0) {
+      setCurrentEvidenceIndex(currentEvidenceIndex - 1);
+    }
+  };
+
+  const handleNextEvidence = () => {
+    if (currentEvidenceIndex < evidenceHistory.length - 1) {
+      setCurrentEvidenceIndex(currentEvidenceIndex + 1);
+    }
+  };
+
+  const renderEvidenceContent = (evidence: any) => {
+    if (!evidence) return null;
+
+    // @img/path 형태의 이미지와 텍스트 처리
+    if (evidence.message && evidence.message.includes("@img/")) {
+      const parts = evidence.message.split("@img/");
+      const textPart = parts[0].trim();
+      const imagePath = parts[1].trim();
+
+      return (
+        <div className="text-center space-y-3">
+          {imagePath && (
+            <div className="mb-4">
+              <img
+                src={`/${imagePath}`}
+                alt="Evidence"
+                className="w-full max-w-xs mx-auto rounded-lg"
+              />
+            </div>
+          )}
+          {textPart ? (
+            <p className="text-sm text-gray-600 leading-relaxed break-words whitespace-pre-wrap">{textPart}</p>
+          ) : imagePath ? (
+            <p className="text-sm text-gray-600 leading-relaxed">
+              데이터 분석 결과 이미지
+            </p>
+          ) : null}
+        </div>
+      );
+    }
+
+    // 차트 타입인 경우
+    if (evidence.type === "chart") {
+      return (
+        <div className="text-center space-y-3">
+          <div className="mb-3">
+            <h4 className="text-sm font-semibold text-gray-800 mb-2">
+              데이터 분석 결과
+            </h4>
+            <div className="relative w-24 h-24 mx-auto">
+              <svg
+                className="w-24 h-24 transform -rotate-90"
+                viewBox="0 0 36 36"
+              >
+                <path
+                  className="text-gray-300"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path
+                  className="text-blue-500"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeDasharray="72, 100"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-sm font-semibold">72%</span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-600 mt-2">
+              선택된 의견들의 긍정적 지지율
+            </p>
+          </div>
+          <div className="text-xs text-gray-500 space-y-1">
+            <div className="flex justify-between">
+              <span>찬성 의견:</span>
+              <span className="font-medium">72%</span>
+            </div>
+            <div className="flex justify-between">
+              <span>반대 의견:</span>
+              <span className="font-medium">28%</span>
+            </div>
+            <div className="flex justify-between">
+              <span>신뢰도:</span>
+              <span className="font-medium text-green-600">높음</span>
+            </div>
+          </div>
+          {evidence.message && evidence.message !== "CHART_DATA" && (
+            <p className="text-sm text-gray-600 leading-relaxed break-words whitespace-pre-wrap mt-4">
+              {evidence.message}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    // 일반 텍스트 메시지
+    return (
+      <p className="text-sm text-gray-600 leading-relaxed break-words whitespace-pre-wrap">
+        {evidence.message}
+      </p>
+    );
   };
 
   if (!forum) {
@@ -529,7 +649,7 @@ const ForumDetailPage = ({ forum, sample_message }: ForumDetailPageProps) => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                          d="M12 5l7 7-7 7M5 12h14"
                         />
                       </svg>
                     </button>
@@ -551,51 +671,47 @@ const ForumDetailPage = ({ forum, sample_message }: ForumDetailPageProps) => {
               </div>
 
               <div className="p-6 space-y-6 flex-1 flex flex-col">
-                {/* Pie chart with text */}
-                <div className="text-center">
-                  <div className="relative w-32 h-32 mx-auto mb-4">
-                    <svg
-                      className="w-32 h-32 transform -rotate-90"
-                      viewBox="0 0 36 36"
-                    >
-                      <path
-                        className="text-gray-300"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      />
-                      <path
-                        className="text-blue-500"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                        strokeDasharray="65, 100"
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-lg font-semibold">2025</span>
+                {/* Evidence content */}
+                <div className="flex-1 flex items-center justify-center">
+                  {evidenceHistory.length > 0 ? (
+                    <div className="w-full">
+                      {renderEvidenceContent(evidenceHistory[currentEvidenceIndex])}
                     </div>
-                  </div>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    어쩌구 저쩌구 토론 관련해서 적혀있는 내용 어쩌구 저쩌구 토론
-                    관련해서 적혀있는 내용어쩌구 저쩌구 토론 관련해서 적혀있는
-                    내용어쩌구 저쩌구 토론 관련해서 적혀있는 내용어쩌구 저쩌구
-                    토론 관련해서 적혀있는 내용 어쩌구 저쩌구 토론 관련해서
-                    적혀있는 내용어쩌구 저쩌구 토론 관련해서 적혀있는 내용어쩌구
-                    저쩌구
-                  </p>
+                  ) : (
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 leading-relaxed break-words whitespace-pre-wrap">
+                        데이터 분석을 시도 하세요
+                      </p>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex justify-between text-sm">
-                  <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-xs">
-                    이번 근거
-                  </button>
-                  <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-xs">
-                    다음 근거
-                  </button>
-                </div>
+                {evidenceHistory.length > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <button 
+                      onClick={handlePreviousEvidence}
+                      disabled={currentEvidenceIndex === 0}
+                      className={`px-3 py-1 rounded-md text-xs ${
+                        currentEvidenceIndex === 0
+                          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                          : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      }`}
+                    >
+                      {currentEvidenceIndex === 0 ? "이번 근거" : "이전 근거"}
+                    </button>
+                    <button 
+                      onClick={handleNextEvidence}
+                      disabled={currentEvidenceIndex === evidenceHistory.length - 1}
+                      className={`px-3 py-1 rounded-md text-xs ${
+                        currentEvidenceIndex === evidenceHistory.length - 1
+                          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                          : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      }`}
+                    >
+                      {currentEvidenceIndex === evidenceHistory.length - 1 ? "이번 근거" : "다음 근거"}
+                    </button>
+                  </div>
+                )}
 
                 <div className="flex space-x-2">
                   {isEvidenceMode && (
