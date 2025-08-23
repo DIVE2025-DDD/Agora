@@ -13,6 +13,12 @@ defmodule Agora.Forum do
     timestamps(type: :utc_datetime)
   end
 
+  def changeset(forum, attrs) do
+    forum
+    |> cast(attrs, [:title, :content, :author, :view_count])
+    |> validate_required([:title, :content, :author])
+  end
+
   def changeset_with_conversation(forum, attrs) do
     conversation_attrs = %{
       title: attrs["title"],

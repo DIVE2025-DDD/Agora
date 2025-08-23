@@ -1,9 +1,51 @@
 import React, { useState } from "react";
 import { Link } from "@inertiajs/react";
 
-const ForumDetailPage = () => {
+interface User {
+  id: number;
+  email: string;
+}
+
+interface Chat {
+  id: number;
+  message: string;
+  sequence: number;
+  inserted_at: string;
+  user: User;
+}
+
+interface Conversation {
+  id: number;
+  chats: Chat[];
+}
+
+interface Forum {
+  id: number;
+  title: string;
+  author: string;
+  content: string;
+  view_count: number;
+  inserted_at: string;
+  updated_at: string;
+  conversation: Conversation | null;
+}
+
+interface ForumDetailPageProps {
+  forum: Forum | null;
+}
+
+const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
   const [message, setMessage] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
+
+  if (!forum) {
+    return <div>포럼을 찾을 수 없습니다.</div>;
+  }
+
+  const chats = forum.conversation?.chats || [];
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('ko-KR');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -29,7 +71,7 @@ const ForumDetailPage = () => {
             </svg>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">
-            토론 주제 이름이 여기에 들어갑니다
+            {forum.title}
           </h1>
         </div>
 
@@ -63,23 +105,16 @@ const ForumDetailPage = () => {
             className={`mt-4 bg-white rounded-lg shadow-sm border p-4 ${isExpanded ? "block" : "hidden"}`}
           >
             <div className="text-sm text-gray-700 leading-relaxed space-y-3">
-              <p>
-                어쩌구 저쩌구 토론 관련해서 적혀있는 내용 어쩌구 저쩌구 토론
-                관련해서 적혀있는 내용어쩌구 저쩌구 토론 관련해서 적혀있는
-                내용어쩌구 저쩌구 토론 관련해서 적혀있는 내용어쩌구 저쩌구 토론
-                관련해서 적혀있는 내용어쩌구 저쩌구 토론 관련해서 적혀있는
-                내용어쩌구 저쩌구 토론 관련해서 적혀있는 내용어쩌구 저쩌구 토론
-                관련해서 적혀있는 내용어쩌구 저쩌구 토론 관련해서 적혀있는 내용.
-              </p>
+              <p>{forum.content}</p>
 
               <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t">
                 <div className="space-y-1">
-                  <div>담당자: 최시영</div>
-                  <div>작성일: 2025.08.12 12:34</div>
+                  <div>담당자: {forum.author}</div>
+                  <div>작성일: {formatDate(forum.inserted_at)}</div>
                 </div>
                 <div className="space-y-1 text-right">
-                  <div>댓글수: 133</div>
-                  <div>조회수: 151</div>
+                  <div>댓글수: {chats.length}</div>
+                  <div>조회수: {forum.view_count}</div>
                 </div>
               </div>
             </div>
@@ -97,105 +132,42 @@ const ForumDetailPage = () => {
 
               {/* Chat messages */}
               <div className="p-4 space-y-4 h-96 overflow-y-auto">
-                {/* User message */}
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                {chats.length === 0 ? (
+                  <div className="text-gray-500 text-center py-8">
+                    아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-700">
-                      어쩌구 저쩌구 토론 관련해서 적혀있는 내용 어쩌구 저쩌구
-                      토론 관련해서 적혀있는 내용어쩌구 저쩌구 토론 관련해서
-                      적혀있는 내용어쩌구 저쩌구
-                    </p>
-                  </div>
-                </div>
-
-                {/* AI response */}
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                    AI
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-700">
-                      어쩌구 저쩌구 토론 관련해서 적혀있는 내용 어쩌구 저쩌구
-                      토론 관련해서 적혀있는 내용어쩌구 저쩌구 토론 관련해서
-                      적혀있는 내용어쩌구 저쩌구
-                    </p>
-                  </div>
-                </div>
-
-                {/* More user messages */}
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-700">
-                      어쩌구 저쩌구 토론 관련해서 적혀있는 내용 어쩌구 저쩌구
-                      토론 관련해서 적혀있는 내용어쩌구 저쩌구 토론 관련해서
-                      적혀있는 내용어쩌구 저쩌구
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-700">
-                      어쩌구 저쩌구 토론 관련해서 적혀있는 내용 어쩌구 저쩌구
-                      토론 관련해서 적혀있는 내용어쩌구 저쩌구 토론 관련해서
-                      적혀있는 내용어쩌구 저쩌구
-                    </p>
-                  </div>
-                </div>
-
-                {/* Long text message */}
-                <div className="text-sm text-gray-700 leading-relaxed">
-                  어쩌구 저쩌구 토론 관련해서 적혀있는 내용 어쩌구 저쩌구 토론
-                  관련해서 적혀있는 내용어쩌구 저쩌구 토론 관련해서 적혀있는
-                  내용어쩌구 저쩌구 토론 관련해서 적혀있는 내용어쩌구 저쩌구
-                  토론 관련해서 적혀있는 내용어쩌구 저쩌구 토론 관련해서
-                  적혀있는 내용어쩌구 저쩌구
-                </div>
-
-                <div className="text-sm text-gray-700 leading-relaxed">
-                  어쩌구 저쩌구 토론 관련해서 적혀있는 내용 어쩌구 저쩌구 토론
-                  관련해서 적혀있는 내용어쩌구 저쩌구 토론 관련해서 적혀있는
-                  내용어쩌구 저쩌구
-                </div>
+                ) : (
+                  chats
+                    .sort((a, b) => a.sequence - b.sequence)
+                    .map((chat) => (
+                      <div key={chat.id} className="flex items-start space-x-3">
+                        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                          <svg
+                            className="w-4 h-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <span className="text-xs font-medium text-gray-600">
+                              {chat.user.email}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              {formatDate(chat.inserted_at)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-700">{chat.message}</p>
+                        </div>
+                      </div>
+                    ))
+                )}
               </div>
 
               {/* Chat input */}
