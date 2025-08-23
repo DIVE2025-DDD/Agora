@@ -37,6 +37,32 @@ defmodule Agora.Chats do
     |> Repo.preload(:user)
   end
 
+  @doc """
+  Gets multiple chats by their IDs and formats them as text for LLM input.
+  Returns a joined string of chat messages in chronological order.
+  """
+  def get_chats_for_llm(chat_ids) when is_list(chat_ids) do
+    from(c in Chat,
+      where: c.id in ^chat_ids,
+      preload: [:user],
+      order_by: [asc: c.inserted_at]
+    )
+    |> Repo.all()
+    |> format_chats_for_llm()
+  end
+
+  @doc """
+  Formats chat messages for LLM input.
+  """
+  def format_chats_for_llm(chats) when is_list(chats) do
+    chats
+    |> Enum.map(fn chat ->
+      user_name = chat.user.nickname || chat.user.email
+      "[#{user_name}]: #{chat.message}"
+    end)
+    |> Enum.join("\n")
+  end
+
   defp get_or_create_conversation_for_forum(forum_id) do
     case Repo.get_by(Conversation, forum_id: forum_id) do
       nil ->

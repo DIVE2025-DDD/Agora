@@ -2,6 +2,7 @@ defmodule AgoraWeb.RoomChannel do
   use AgoraWeb, :channel
   alias Agora.Forums
   alias Agora.Chats
+  alias Agora.LlmContext
 
   @impl true
   def join("room:lobby", payload, socket) do
@@ -71,38 +72,33 @@ defmodule AgoraWeb.RoomChannel do
   @impl true
   def handle_in("generate_evidence", %{"chat_ids" => chat_ids, "forum_id" => forum_id}, socket) do
     Task.start(fn ->
-      # 샘플 응답 데이터
-      sample_messages = [
-        "영도구 외국인 소비액 7,243,337원(2.0%)로 하위권.
-        해운대 366,460,819원(3.0%)·부산진 205,272,390원(4.0%)·중구 105,718,041원(10.0%) 대비 낮음.
-        → 현재 데이터 기준 ‘영도구 안내센터 우선’ 근거 약함."
-      ]
+      # 실제 채팅 내용을 조회하여 LLM 입력용 텍스트로 변환
+      chat_content = Chats.get_chats_for_llm(chat_ids)
+      IO.inspect(chat_content, label: "Chat content for LLM")
 
-      # 스트리밍 시뮬레이션 (실제로는 LLM API 호출)
-      selected_message = Enum.random(sample_messages)
+      # LLM API 호출을 통한 증거 생성
+      result = LlmContext.generate_evidence(chat_content)
 
-      # 스트리밍 청크 전송 (선택사항)
-      words = String.split(selected_message, " ")
+      case result do
+        {:ok, evidence_text} ->
+          # 최종 응답 전송
+          broadcast(socket, "evidence_response", %{
+            content: evidence_text,
+            timestamp: DateTime.utc_now() |> DateTime.to_iso8601()
+          })
 
-      Enum.each(words, fn word ->
-        broadcast(socket, "stream_chunk", %{
-          text: word <> " ",
-          timestamp: DateTime.utc_now() |> DateTime.to_iso8601()
-        })
-
-        # 스트리밍 효과
-        Process.sleep(50)
-      end)
-
-      # 최종 응답 전송
-      broadcast(socket, "evidence_response", %{
-        content: selected_message,
-        timestamp: DateTime.utc_now() |> DateTime.to_iso8601()
-      })
+        {:error, error} ->
+          # 에러 응답 전송
+          broadcast(socket, "evidence_error", %{
+            error: error,
+            timestamp: DateTime.utc_now() |> DateTime.to_iso8601()
+          })
+      end
     end)
 
     {:reply, {:ok, %{status: "generating"}}, socket}
   end
+
 
   # Add authorization logic here as required.
   defp authorized?(_payload) do
