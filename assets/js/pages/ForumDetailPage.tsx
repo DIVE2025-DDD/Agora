@@ -34,13 +34,14 @@ interface Forum {
 
 interface ForumDetailPageProps {
   forum: Forum | null;
+  sample_message?: string;
   user?: {
     id: number;
     email: string;
   };
 }
 
-const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
+const ForumDetailPage = ({ forum, sample_message }: ForumDetailPageProps) => {
   const { props } = usePage();
   const user = props.user;
   const [message, setMessage] = useState("");
@@ -53,12 +54,31 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
   const [isEvidenceMode, setIsEvidenceMode] = useState(false);
   const [selectedChats, setSelectedChats] = useState<number[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [streamingMessage, setStreamingMessage] = useState("");
 
   useEffect(() => {
     if (forum?.conversation?.chats) {
       setChats(forum.conversation.chats);
     }
   }, [forum]);
+
+  useEffect(() => {
+    // sample_message가 있으면 DDD-bot 메시지로 추가
+    if (sample_message && chats.length > 0) {
+      const dddBotMessage: Chat = {
+        id: Date.now(),
+        message: sample_message,
+        sequence: Math.max(...chats.map(c => c.sequence)) + 1,
+        inserted_at: new Date().toISOString(),
+        user: {
+          id: -1,
+          email: "DDD-bot",
+        },
+      };
+      setChats(prevChats => [...prevChats, dddBotMessage]);
+    }
+  }, [sample_message, chats.length]);
+
 
   useEffect(() => {
     if (!socket || !forum) return;
@@ -83,6 +103,37 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
       setChats((prevChats) => [...prevChats, payload.chat]);
     });
 
+    // Listen for AI evidence response
+    newChannel.on("evidence_response", (payload) => {
+      console.log("AI evidence response received:", payload);
+      setChats((prevChats) => {
+        const maxSequence = prevChats.length > 0 ? Math.max(...prevChats.map(c => c.sequence)) : 0;
+        const aiResponse: Chat = {
+          id: Date.now(),
+          message: payload.content,
+          sequence: maxSequence + 1,
+          inserted_at: new Date().toISOString(),
+          user: {
+            id: -1,
+            email: "DDD-bot",
+          },
+        };
+        return [...prevChats, aiResponse];
+      });
+      
+      // 모드 리셋
+      setIsEvidenceMode(false);
+      setSelectedChats([]);
+      setIsGenerating(false);
+      setStreamingMessage(""); // 스트리밍 메시지 초기화
+    });
+
+    // Listen for AI streaming chunks
+    newChannel.on("stream_chunk", (payload) => {
+      console.log("AI stream chunk received:", payload);
+      setStreamingMessage(prev => prev + payload.text);
+    });
+
     return () => {
       newChannel.leave();
       setChannel(null);
@@ -91,7 +142,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [chats]);
+  }, [chats, streamingMessage]);
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
@@ -145,63 +196,26 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
       setSelectedChats([]);
     } else {
       // 선택된 채팅들로 AI 응답 생성
-      if (selectedChats.length === 0) return;
+      if (selectedChats.length === 0 || !channel) return;
 
       setIsGenerating(true);
+      setStreamingMessage(""); // 새로운 생성 시작 시 스트리밍 메시지 초기화
 
-      // API 호출
-      fetch(`/api/forum/${forum.id}/generate_evidence`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ids: selectedChats
+      // 웹소켓을 통해 AI 응답 요청
+      channel
+        .push("generate_evidence", {
+          chat_ids: selectedChats,
+          forum_id: forum.id
         })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          let aiResponse: Chat;
-
-          if (data.data.type === "chart") {
-            // 차트 응답
-            aiResponse = {
-              id: Date.now(),
-              message: "CHART_DATA",
-              sequence: Math.max(...chats.map(c => c.sequence)) + 1,
-              inserted_at: new Date().toISOString(),
-              user: {
-                id: -1,
-                email: "DDD-bot",
-              },
-            };
-          } else {
-            // 메시지 응답
-            aiResponse = {
-              id: Date.now(),
-              message: data.data.message,
-              sequence: Math.max(...chats.map(c => c.sequence)) + 1,
-              inserted_at: new Date().toISOString(),
-              user: {
-                id: -1,
-                email: "DDD-bot",
-              },
-            };
-          }
-
-          setChats((prev) => [...prev, aiResponse]);
-        }
-
-        // 모드 리셋
-        setIsEvidenceMode(false);
-        setSelectedChats([]);
-        setIsGenerating(false);
-      })
-      .catch(error => {
-        console.error('Error generating evidence:', error);
-        setIsGenerating(false);
-      });
+        .receive("ok", (response) => {
+          console.log("Evidence generation request sent successfully", response);
+        })
+        .receive("error", (response) => {
+          console.log("Error sending evidence generation request", response);
+          setIsGenerating(false);
+          setIsEvidenceMode(false);
+          setSelectedChats([]);
+        });
     }
   };
 
@@ -454,6 +468,36 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                       );
                     })
                 )}
+                
+                {/* 스트리밍 메시지 표시 */}
+                {isGenerating && streamingMessage && (
+                  <div className="flex items-start space-x-3 p-3 rounded-lg">
+                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
+                      <img
+                        src="/images/AI.png"
+                        alt="AI"
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="text-xs font-medium text-gray-600">
+                          DDD-bot
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          생성 중...
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm inline-block px-3 py-2 rounded-lg bg-green-100 text-gray-800 border border-green-200">
+                          {streamingMessage}
+                          <span className="animate-pulse">▋</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <div ref={messagesEndRef} />
               </div>
 

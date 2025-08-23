@@ -65,6 +65,7 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  config :langchain, :anthropic_key, System.fetch_env!("ANTHROPIC_API_KEY")
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

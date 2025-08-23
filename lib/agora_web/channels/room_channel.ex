@@ -68,6 +68,40 @@ defmodule AgoraWeb.RoomChannel do
     end
   end
 
+  @impl true
+  def handle_in("generate_evidence", %{"chat_ids" => chat_ids, "forum_id" => forum_id}, socket) do
+    Task.start(fn ->
+      # 샘플 응답 데이터
+      sample_messages = [
+        "분석 결과, 선택하신 의견들은 SDG 목표 달성에 직접적으로 기여할 수 있는 방향성을 제시하고 있은 SDG 목표 달성에 직접적으로 기여할 수 있는 방향성을 은 SDG 목표 달성에 직접적으로 기여할 수 있는 방향성을 은 SDG 목표 달성에 직접적으로 기여할 수 있는 방향성을 은 SDG 목표 달성에 직접적으로 기여할 수 있는 방향성을 은 SDG 목표 달성에 직접적으로 기여할 수 있는 방향성을 은 SDG 목표 달성에 직접적으로 기여할 수 있는 방향성을 습니다. 구체적인 실행 계획이 필요한 상황입니다."
+      ]
+
+      # 스트리밍 시뮬레이션 (실제로는 LLM API 호출)
+      selected_message = Enum.random(sample_messages)
+
+      # 스트리밍 청크 전송 (선택사항)
+      words = String.split(selected_message, " ")
+
+      Enum.each(words, fn word ->
+        broadcast(socket, "stream_chunk", %{
+          text: word <> " ",
+          timestamp: DateTime.utc_now() |> DateTime.to_iso8601()
+        })
+
+        # 스트리밍 효과
+        Process.sleep(50)
+      end)
+
+      # 최종 응답 전송
+      broadcast(socket, "evidence_response", %{
+        content: selected_message,
+        timestamp: DateTime.utc_now() |> DateTime.to_iso8601()
+      })
+    end)
+
+    {:reply, {:ok, %{status: "generating"}}, socket}
+  end
+
   # Add authorization logic here as required.
   defp authorized?(_payload) do
     true
