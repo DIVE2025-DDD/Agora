@@ -5,6 +5,7 @@ import { PhoenixSocketContext } from "../lib/phoenixSocketContext";
 interface User {
   id: number;
   email: string;
+  nickname?: string;
 }
 
 interface Chat {
@@ -130,10 +131,10 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
   const handleChatSelection = (chatId: number) => {
     if (!isEvidenceMode) return;
 
-    setSelectedChats(prev =>
+    setSelectedChats((prev) =>
       prev.includes(chatId)
-        ? prev.filter(id => id !== chatId)
-        : [...prev, chatId]
+        ? prev.filter((id) => id !== chatId)
+        : [...prev, chatId],
     );
   };
 
@@ -150,7 +151,9 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
 
       // 샘플 데이터로 처리
       setTimeout(() => {
-        const selectedChatData = chats.filter(chat => selectedChats.includes(chat.id));
+        const selectedChatData = chats.filter((chat) =>
+          selectedChats.includes(chat.id),
+        );
 
         // 랜덤하게 차트 또는 메시지 타입 결정
         const isChart = Math.random() > 0.5;
@@ -166,30 +169,31 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
             inserted_at: new Date().toISOString(),
             user: {
               id: -1,
-              email: 'AI Assistant'
-            }
+              email: "AI Assistant",
+            },
           };
         } else {
           // 메시지 응답
           const sampleMessages = [
             "선택하신 의견들을 분석한 결과, 지속가능성 측면에서 긍정적인 효과가 예상됩니다. 특히 환경적 영향을 고려할 때 2025년까지 약 15%의 개선 효과를 기대할 수 있습니다.",
             "제시된 논점들을 종합해보면, 경제적 타당성과 환경적 지속가능성 사이의 균형이 중요합니다. 데이터에 따르면 장기적으로 투자 대비 효과가 높을 것으로 예측됩니다.",
-            "분석 결과, 선택하신 의견들은 SDG 목표 달성에 직접적으로 기여할 수 있는 방향성을 제시하고 있습니다. 구체적인 실행 계획이 필요한 상황입니다."
+            "분석 결과, 선택하신 의견들은 SDG 목표 달성에 직접적으로 기여할 수 있는 방향성을 제시하고 있습니다. 구체적인 실행 계획이 필요한 상황입니다.",
           ];
 
           aiResponse = {
             id: Date.now(),
-            message: sampleMessages[Math.floor(Math.random() * sampleMessages.length)],
+            message:
+              sampleMessages[Math.floor(Math.random() * sampleMessages.length)],
             sequence: chats.length + 1,
             inserted_at: new Date().toISOString(),
             user: {
               id: -1,
-              email: 'AI Assistant'
-            }
+              email: "AI Assistant",
+            },
           };
         }
 
-        setChats(prev => [...prev, aiResponse]);
+        setChats((prev) => [...prev, aiResponse]);
 
         // 모드 리셋
         setIsEvidenceMode(false);
@@ -203,7 +207,16 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
     return <div>포럼을 찾을 수 없습니다.</div>;
   }
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("ko-KR");
+    const date = new Date(dateString);
+    // UTC 시간을 현지 시간으로 변환
+    return date.toLocaleString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
   };
 
   return (
@@ -259,7 +272,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
             className={`mt-4 bg-white rounded-lg border border-gray-200 shadow-sm p-4 ${isExpanded ? "block" : "hidden"}`}
           >
             <div className="text-sm text-gray-700 leading-relaxed space-y-3">
-              <p>{forum.content}</p>
+              <div dangerouslySetInnerHTML={{ __html: forum.content }} />
 
               <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t">
                 <div className="space-y-1">
@@ -306,18 +319,24 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                       const isSelected = selectedChats.includes(chat.id);
 
                       return (
-                        <div 
-                          key={chat.id} 
+                        <div
+                          key={chat.id}
                           className={`flex items-start space-x-3 p-3 rounded-lg transition-colors ${
-                            isMyMessage ? "flex-row-reverse space-x-reverse" : ""
+                            isMyMessage
+                              ? "flex-row-reverse space-x-reverse"
+                              : ""
                           } ${
-                            isEvidenceMode 
+                            isEvidenceMode
                               ? `cursor-pointer hover:opacity-75 ${
-                                  isSelected ? "bg-white shadow-md" : "bg-gray-400"
-                                }` 
+                                  isSelected
+                                    ? "bg-white shadow-md"
+                                    : "bg-gray-400"
+                                }`
                               : ""
                           }`}
-                          onClick={() => isEvidenceMode && handleChatSelection(chat.id)}
+                          onClick={() =>
+                            isEvidenceMode && handleChatSelection(chat.id)
+                          }
                         >
                           <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
                             <svg
@@ -333,21 +352,29 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                             </svg>
                           </div>
                           <div className="flex-1">
-                            <div className={`flex items-center space-x-2 mb-1 ${
-                              isMyMessage ? "flex-row-reverse space-x-reverse" : ""
-                            }`}>
+                            <div
+                              className={`flex items-center space-x-2 mb-1 ${
+                                isMyMessage
+                                  ? "flex-row-reverse space-x-reverse"
+                                  : ""
+                              }`}
+                            >
                               <span className="text-xs font-medium text-gray-600">
-                                {chat.user.nickname}
+                                {chat.user.nickname || chat.user.email}
                               </span>
                               <span className="text-xs text-gray-400">
                                 {formatDate(chat.inserted_at)}
                               </span>
                             </div>
-                            <div className={`${isMyMessage ? "text-right" : ""}`}>
+                            <div
+                              className={`${isMyMessage ? "text-right" : ""}`}
+                            >
                               {chat.message === "CHART_DATA" ? (
                                 <div className="inline-block p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
                                   <div className="text-center mb-3">
-                                    <h4 className="text-sm font-semibold text-gray-800 mb-2">데이터 분석 결과</h4>
+                                    <h4 className="text-sm font-semibold text-gray-800 mb-2">
+                                      데이터 분석 결과
+                                    </h4>
                                     <div className="relative w-24 h-24 mx-auto">
                                       <svg
                                         className="w-24 h-24 transform -rotate-90"
@@ -370,7 +397,9 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                                         />
                                       </svg>
                                       <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-sm font-semibold">72%</span>
+                                        <span className="text-sm font-semibold">
+                                          72%
+                                        </span>
                                       </div>
                                     </div>
                                     <p className="text-xs text-gray-600 mt-2">
@@ -388,20 +417,24 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                                     </div>
                                     <div className="flex justify-between">
                                       <span>신뢰도:</span>
-                                      <span className="font-medium text-green-600">높음</span>
+                                      <span className="font-medium text-green-600">
+                                        높음
+                                      </span>
                                     </div>
                                   </div>
                                 </div>
                               ) : (
-                                <p className={`text-sm inline-block px-3 py-2 rounded-lg transition-colors ${
-                                  isEvidenceMode
-                                    ? "text-gray-700"
-                                    : chat.user.id === -1
-                                      ? "bg-green-100 text-gray-800 border border-green-200"
-                                      : isMyMessage 
-                                        ? "bg-blue-500 text-white" 
-                                        : "bg-gray-100 text-gray-700"
-                                }`}>
+                                <p
+                                  className={`text-sm inline-block px-3 py-2 rounded-lg transition-colors ${
+                                    isEvidenceMode
+                                      ? "text-gray-700"
+                                      : chat.user.id === -1
+                                        ? "bg-green-100 text-gray-800 border border-green-200"
+                                        : isMyMessage
+                                          ? "bg-blue-500 text-white"
+                                          : "bg-gray-100 text-gray-700"
+                                  }`}
+                                >
                                   {chat.message}
                                 </p>
                               )}
@@ -519,14 +552,16 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                       : "bg-blue-500 hover:bg-blue-600 text-white"
                   }`}
                   onClick={handleEvidenceSearch}
-                  disabled={isEvidenceMode && (selectedChats.length === 0 || isGenerating)}
+                  disabled={
+                    isEvidenceMode &&
+                    (selectedChats.length === 0 || isGenerating)
+                  }
                 >
                   {isGenerating
                     ? "생성 중..."
                     : isEvidenceMode
                       ? "생성하기"
-                      : "데이터 출처에서 내 주장 근거 찾기"
-                  }
+                      : "데이터 출처에서 내 주장 근거 찾기"}
                 </button>
               </div>
             </div>
