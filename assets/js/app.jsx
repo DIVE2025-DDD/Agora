@@ -1,6 +1,5 @@
 import React from "react";
 import axios from "axios";
-import "react-quill-new/dist/quill.snow.css"; // vendor 먼저
 
 import { createInertiaApp } from "@inertiajs/react";
 import { createRoot } from "react-dom/client";
