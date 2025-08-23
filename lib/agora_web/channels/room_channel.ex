@@ -55,7 +55,8 @@ defmodule AgoraWeb.RoomChannel do
             inserted_at: chat_with_user.inserted_at,
             user: %{
               id: chat_with_user.user.id,
-              email: chat_with_user.user.email
+              email: chat_with_user.user.email,
+              nickname: chat_with_user.user.nickname
             }
           }
         })

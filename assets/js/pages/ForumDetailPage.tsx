@@ -242,7 +242,7 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-1">
                             <span className="text-xs font-medium text-gray-600">
-                              {chat.user.email}
+                              {chat.user.nickname}
                             </span>
                             <span className="text-xs text-gray-400">
                               {formatDate(chat.inserted_at)}
