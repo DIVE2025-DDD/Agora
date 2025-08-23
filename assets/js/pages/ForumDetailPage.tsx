@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { Link, usePage } from "@inertiajs/react";
-import { PhoenixSocketContext } from "../lib/phoenixSocketContext";
+import { PhoenixSocketContext } from "@/lib/phoenixSocketContext";
 
 interface User {
   id: number;
@@ -339,17 +339,25 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                           }
                         >
                           <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
-                            <svg
-                              className="w-4 h-4"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                clipRule="evenodd"
+                            {chat.user.id === -1 ? (
+                              <img
+                                src="/images/AI.png"
+                                alt="AI"
+                                className="w-full h-full rounded-full object-cover"
                               />
-                            </svg>
+                            ) : (
+                              <svg
+                                className="w-4 h-4"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            )}
                           </div>
                           <div className="flex-1">
                             <div
@@ -543,26 +551,39 @@ const ForumDetailPage = ({ forum }: ForumDetailPageProps) => {
                   </button>
                 </div>
 
-                <button
-                  className={`w-full py-3 px-4 rounded-md text-sm mt-auto transition-colors ${
-                    isEvidenceMode
-                      ? selectedChats.length > 0 && !isGenerating
-                        ? "bg-green-500 hover:bg-green-600 text-white"
-                        : "bg-gray-400 text-white cursor-not-allowed"
-                      : "bg-blue-500 hover:bg-blue-600 text-white"
-                  }`}
-                  onClick={handleEvidenceSearch}
-                  disabled={
-                    isEvidenceMode &&
-                    (selectedChats.length === 0 || isGenerating)
-                  }
-                >
-                  {isGenerating
-                    ? "생성 중..."
-                    : isEvidenceMode
-                      ? "생성하기"
-                      : "데이터 출처에서 내 주장 근거 찾기"}
-                </button>
+                <div className="flex space-x-2">
+                  {isEvidenceMode && (
+                    <button
+                      className="flex-1 py-2 px-4 rounded-md text-sm bg-gray-500 hover:bg-gray-600 text-white transition-colors text-center"
+                      onClick={() => {
+                        setIsEvidenceMode(false);
+                        setSelectedChats([]);
+                      }}
+                    >
+                      취소하기
+                    </button>
+                  )}
+                  <button
+                    className={`flex-1 py-3 px-4 rounded-md text-sm transition-colors text-center ${
+                      isEvidenceMode
+                        ? selectedChats.length > 0 && !isGenerating
+                          ? "bg-green-500 hover:bg-green-600 text-white"
+                          : "bg-gray-400 text-white cursor-not-allowed"
+                        : "bg-blue-500 hover:bg-blue-600 text-white"
+                    }`}
+                    onClick={handleEvidenceSearch}
+                    disabled={
+                      isEvidenceMode &&
+                      (selectedChats.length === 0 || isGenerating)
+                    }
+                  >
+                    {isGenerating
+                      ? "생성 중..."
+                      : isEvidenceMode
+                        ? "생성하기"
+                        : "데이터 출처에서 내 주장 근거 찾기"}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
