@@ -21,6 +21,7 @@ const RichEditor: React.FC<Props> = ({
       onChange={onChange}
       placeholder={placeholder}
       className={className}
+      style={{ height: '300px' }}
     />
   );
 };
